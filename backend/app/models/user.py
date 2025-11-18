@@ -1,42 +1,51 @@
 from typing import Optional
 from datetime import datetime
-from sqlmodel import Field, SQLModel
-from pydantic import EmailStr
+from beanie import Document, Indexed
+from pydantic import BaseModel, EmailStr, Field
 
-class UserBase(SQLModel):
-    """Base User model with shared fields"""
-    email: EmailStr = Field(unique=True, index=True)
-    is_active: bool = Field(default=True)
-    is_superuser: bool = Field(default=False)
-
-class User(UserBase, table=True):
+class User(Document):
     """User database model"""
-    __tablename__ = "users"
-    
-    id: Optional[int] = Field(default=None, primary_key=True)
+    email: Indexed(EmailStr, unique=True)
     hashed_password: str
+    is_active: bool = True
+    is_superuser: bool = False
     created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: Optional[datetime] = Field(default=None)
+    updated_at: Optional[datetime] = None
+    
+    class Settings:
+        name = "users"
+        indexes = [
+            "email",
+        ]
 
-class UserCreate(UserBase):
+class UserCreate(BaseModel):
     """Schema for creating a new user"""
+    email: EmailStr
     password: str = Field(min_length=8)
+    is_active: bool = True
+    is_superuser: bool = False
 
-class UserLogin(SQLModel):
+class UserLogin(BaseModel):
     """Schema for user login"""
     email: EmailStr
     password: str
 
-class UserResponse(UserBase):
+class UserResponse(BaseModel):
     """Schema for user response (excludes password)"""
-    id: int
+    id: str
+    email: EmailStr
+    is_active: bool
+    is_superuser: bool
     created_at: datetime
+    
+    class Config:
+        from_attributes = True
 
-class Token(SQLModel):
+class Token(BaseModel):
     """Token response schema"""
     access_token: str
     token_type: str = "bearer"
 
-class TokenData(SQLModel):
+class TokenData(BaseModel):
     """Token payload data"""
     email: Optional[str] = None
