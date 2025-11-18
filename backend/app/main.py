@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 
 from app.core.config import settings
-from app.db.database import init_db
+from app.db.database import connect_to_mongo, close_mongo_connection, init_db
 from app.api.routes import auth
 
 @asynccontextmanager
@@ -11,11 +11,13 @@ async def lifespan(app: FastAPI):
     """Handle startup and shutdown events"""
     # Startup
     print("🚀 Starting up City Planning API...")
+    await connect_to_mongo()
     await init_db()
-    print("✅ Database initialized")
+    print("✅ Database initialized and ready")
     yield
     # Shutdown
     print("🔴 Shutting down...")
+    await close_mongo_connection()
 
 app = FastAPI(
     title=settings.APP_NAME,
