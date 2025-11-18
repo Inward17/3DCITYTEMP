@@ -1,10 +1,7 @@
 from typing import Optional
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlmodel import select
 
-from app.db.database import get_session
 from app.core.security import decode_access_token
 from app.models.user import User, TokenData
 
@@ -12,8 +9,7 @@ from app.models.user import User, TokenData
 security = HTTPBearer()
 
 async def get_current_user(
-    credentials: HTTPAuthorizationCredentials = Depends(security),
-    session: AsyncSession = Depends(get_session)
+    credentials: HTTPAuthorizationCredentials = Depends(security)
 ) -> User:
     """Dependency to get current authenticated user"""
     
@@ -34,10 +30,8 @@ async def get_current_user(
     if email is None:
         raise credentials_exception
     
-    # Get user from database
-    statement = select(User).where(User.email == email)
-    result = await session.execute(statement)
-    user = result.scalar_one_or_none()
+    # Get user from database using Beanie
+    user = await User.find_one(User.email == email)
     
     if user is None:
         raise credentials_exception
