@@ -20,16 +20,14 @@ async def close_mongo_connection():
 
 async def init_db():
     """Initialize database and register models"""
-    # Import all models here
+    # Import all document models here (Location and Road are now embedded)
     from app.models.user import User
     from app.models.project import Project
-    from app.models.location import Location
-    from app.models.road import Road
     
-    # Initialize Beanie with the models
+    # Initialize Beanie with the document models only
     await init_beanie(
         database=mongo_client[settings.DATABASE_NAME],
-        document_models=[User, Project, Location, Road]
+        document_models=[User, Project]
     )
     print(f"✅ Beanie initialized with database: {settings.DATABASE_NAME}")
 
