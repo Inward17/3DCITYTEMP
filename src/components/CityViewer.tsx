@@ -7,7 +7,6 @@ import { LocationInfo } from './LocationInfo';
 import { SectorSelector } from './SectorSelector';
 import { SectorAnalytics } from './SectorAnalytics';
 import { LocationComments } from './LocationComments';
-import { ExportControls } from './ExportControls';
 import { MiniMap } from './MiniMap';
 import { DarkModeToggle } from './DarkModeToggle';
 import { CameraUIControls } from './CameraUIControls';
@@ -199,14 +198,13 @@ export function CityViewer() {
           <div style={{ width: '100%', height: '100%', position: 'relative' }}>
             <CityScene locations={combinedLocations} roads={combinedRoads} />
             <CameraUIControls />
-            <ExportControls projectName={project.name} projectId={project.id} />
             <CityControls />
             <BuildingPlacement />
             <LocationInfo />
-            <MiniMap 
-              locations={combinedLocations} 
+            <MiniMap
+              locations={combinedLocations}
               roads={combinedRoads}
-              viewPosition={[0, 20, 0]} // This would come from camera position in a real implementation
+              viewPosition={[0, 20, 0]}
             />
           </div>
         )}
